@@ -1,27 +1,16 @@
 ---
 title: "**Titulares de prensa seleccionada**"
-author: ""
+author: "___________"
 date: "`r paste('', format(Sys.Date(), '%d-%B- %Y'))`"
 output: html_document
-always_allow_html: true
 params:   
   date: "`r paste('', format(Sys.Date(), '%d-%B- %Y'))`"
-urlcolor: red
-classoption: landscape
-header-includes:
-- \usepackage{pdflscape}
-- \usepackage{ragged2e}
-- \usepackage{babel}
-- \newcommand{\blandscape}{\begin{landscape}}
-- \newcommand{\elandscape}{\end{landscape}}
-toc: false
 ---
 
 
 ```{r, include=FALSE}
 options(tinytex.verbose = TRUE)
 ```
-
 
 ```{r setup, include=FALSE, message=FALSE}
  #- \DeclareUnicodeCharacter{0301}{\'{e}}
@@ -178,10 +167,9 @@ knitr::kable(tabla_trab_print, format = "simple")
 ```
 
 
-
 # Nube de palabras más repetidas en titulares
 \centering
-![](C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf){width=50%}
+![]("C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf"){width=50%}
 <!-- ![](../Resultados/graf_1.png){width=50%, height=40%} -->
 
 
@@ -194,7 +182,7 @@ url2 <- "https://si3.bcentral.cl/indicadoressiete/secure/Serie.aspx?gcode=PRE_TC
 
 ind <- read_html(url2)   
   
-ind2 <- ind |>  html_elements('.table')  
+ind2 <- ind |>  html_elements(".table")  
 
 table <- ind2 |>  html_elements(".table") |> html_table()
 
@@ -214,7 +202,7 @@ url2_eu <- "https://si3.bcentral.cl/indicadoressiete/secure/Serie.aspx?gcode=PRE
 
 ind_eu <- read_html(url2_eu)   
   
-ind2_eu <- ind_eu |>  html_elements('.table')  
+ind2_eu <- ind_eu |>  html_elements(".table")  
 
 table_eu <- ind2_eu |>  html_elements(".table") |> html_table()
 
