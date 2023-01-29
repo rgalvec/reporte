@@ -181,7 +181,7 @@ knitr::kable(tabla_trab_print, format = "simple")
 
 # Nube de palabras más repetidas en titulares
 \centering
-![](C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf){width=60%}
+![](C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf){width=50%}
 <!-- ![](../Resultados/graf_1.png){width=50%, height=40%} -->
 
 
