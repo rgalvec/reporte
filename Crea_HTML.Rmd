@@ -1,0 +1,366 @@
+---
+title: "**Titulares de prensa seleccionada**"
+author: ""
+date: "`r paste('', format(Sys.Date(), '%d-%B- %Y'))`"
+output: html_document
+always_allow_html: true
+params:   
+  date: "`r paste('', format(Sys.Date(), '%d-%B- %Y'))`"
+urlcolor: red
+classoption: landscape
+header-includes:
+- \usepackage{pdflscape}
+- \usepackage{ragged2e}
+- \usepackage{babel}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+toc: false
+---
+
+
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
+
+```{r setup, include=FALSE, message=FALSE}
+ #- \DeclareUnicodeCharacter{0301}{\'{e}}
+options(tinytex.verbose = TRUE)
+# Se corrigieron errores en los link de DF conflicto con "dfmas" 
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(rvest)
+library(knitr)
+library(kableExtra)
+library(htmltools)
+library(xlsx)
+
+```
+ 
+# Tablas por tema
+```{r pensiones, echo=FALSE}
+
+# carga las rutas de las carpetas y archivos
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "tabla.prueba.rds"
+file2 <- "lista.pensiones.rds"
+ 
+tabla <- readRDS(paste0(ruta, file1))
+lista_prueba <- readRDS(paste0(ruta, file2))
+
+
+cat("Lista de Pensiones: ",
+    paste(collapse=", ",str_to_upper(lista_prueba)))
+
+tabla_pensiones <- tabla |> 
+  select(Medio, Titular) |> 
+  rename("Titulares de medios sobre **PENSIONES**" = Titular) 
+
+tabla_pensiones <-  tabla_pensiones |> arrange(desc(Medio))
+
+knitr::kable(tabla_pensiones, format = "simple") 
+```   
+ 
+```{r personas, echo=FALSE}
+
+# carga las rutas de las carpetas y archivos
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "tabla.personas.rds"
+file2 <- "lista.personas.rds"
+
+tabla_personas <- readRDS(paste0(ruta, file1))
+lista_personas <- readRDS(paste0(ruta, file2))
+
+cat("Lista de Personas: ",
+    paste(collapse=", ",str_to_upper(lista_personas)))
+
+tabla_personas_print <- tabla_personas |> 
+  select(Titular) |> 
+  mutate(left_join(tabla_personas, tabla, by="Titular")) |> 
+  filter(is.na(Medio.y)) |> 
+  rename(Medio = Medio.x) |> 
+  select(-Medio.y) |> 
+  select(Medio, Titular) |> 
+  rename("Titulares de medios sobre **PERSONAS**" = Titular) 
+
+tabla_personas_print <-  tabla_personas_print |> arrange(desc(Medio))
+
+knitr::kable(tabla_personas_print, format = "simple") 
+
+```
+ 
+```{r instituciones, echo=FALSE}
+
+# carga las rutas de las carpetas y archivos
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "tabla.instituciones.rds"
+file2 <- "lista.instituciones.rds"
+
+
+tabla_instituciones <- readRDS(paste0(ruta, file1))
+lista_instituciones <- readRDS(paste0(ruta, file2))
+
+# Unir tabla anteriores para no repetir titulares
+
+# tabla_1 <- tabla_pensiones |> 
+#   rename(Titular = `Titulares de medios sobre **PENSIONES**`)
+# 
+# tabla_2 <- tabla_personas |> 
+#   select(Titular)
+# 
+# tabla_3 <- tabla_instituciones |> 
+#   select(Titular)
+# 
+# tabla_instituciones_filtro <-  rbind(tabla_1, tabla_2, tabla_3)
+
+ cat("Lista de Instituciones: ",
+    paste(collapse=", ",str_to_upper(lista_instituciones)))
+
+tabla_instituciones_filtro <-bind_rows(tabla, tabla_personas)
+
+
+tabla_inst_print <- tabla_instituciones |> 
+  select(Titular) |> 
+  mutate(unique(left_join(tabla_instituciones,
+                   tabla_instituciones_filtro, by="Titular"))) |> 
+  filter(is.na(Medio.y)) |> 
+  rename(Medio = Medio.x) |> 
+  select(-Medio.y) |> 
+  select(Medio, Titular) |> 
+  rename("Titulares de medios sobre **INSTITUCIONES**" = Titular) 
+
+
+tabla_inst_print <-  tabla_inst_print|> arrange(desc(Medio))
+
+knitr::kable(tabla_inst_print, format = "simple") 
+
+
+```
+
+
+```{r, trabajo, echo=FALSE}
+
+# carga las rutas de las carpetas y archivos
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "lista.trabajo.rds"
+file2 <- "lista_trabajo.rds"
+
+
+tabla_trabajo <- readRDS(paste0(ruta, file1))
+lista_trabajo <- readRDS(paste0(ruta, file2))
+
+ cat("Lista de Trabajo y Empleo: ",
+    paste(collapse=", ",str_to_upper(lista_trabajo)))
+ 
+tabla_instituciones_filtro <- bind_rows(tabla, tabla_personas, tabla_instituciones)
+
+ if(length(tabla_trabajo!=0)){
+ 
+  tabla_trab_print <-  tabla_trabajo|> 
+  select(Titular) |> 
+  mutate(unique(left_join(tabla_trabajo,
+                   tabla_instituciones_filtro, by="Titular"))) |> 
+  rename(Medio = Medio.x) |> 
+  select(-Medio.y) |> 
+  select(Medio, Titular) |> 
+  rename("Titulares de medios sobre **TRABAJO Y EMPLEO**" = Titular) 
+
+
+tabla_trab_print <-  tabla_trab_print|> arrange(desc(Medio))
+
+knitr::kable(tabla_trab_print, format = "simple") 
+
+}
+
+
+```
+
+
+
+# Nube de palabras más repetidas en titulares
+\centering
+![](C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf){width=60%}
+<!-- ![](../Resultados/graf_1.png){width=50%, height=40%} -->
+
+
+\blandscape
+
+```{r dolar, echo=FALSE, fig.height=3}
+
+# BC Dolares 
+url2 <- "https://si3.bcentral.cl/indicadoressiete/secure/Serie.aspx?gcode=PRE_TCO&param=RABmAFYAWQB3AGYAaQBuAEkALQAzADUAbgBNAGgAaAAkADUAVwBQAC4AbQBYADAARwBOAGUAYwBjACMAQQBaAHAARgBhAGcAUABTAGUAdwA1ADQAMQA0AE0AawBLAF8AdQBDACQASABzAG0AXwA2AHQAawBvAFcAZwBKAEwAegBzAF8AbgBMAHIAYgBDAC4ARQA3AFUAVwB4AFIAWQBhAEEAOABkAHkAZwAxAEEARAA="
+
+ind <- read_html(url2)   
+  
+ind2 <- ind |>  html_elements('.table')  
+
+table <- ind2 |>  html_elements(".table") |> html_table()
+
+tabla_dolar <- table[[1]] |> janitor::clean_names()
+
+ 
+
+td_ene<- tabla_dolar |> 
+  select(da_a, enero) |> 
+  rename(dia=da_a,
+         Dolar= enero) |> 
+  filter(dia>=1)
+
+
+#BC Euros
+url2_eu <- "https://si3.bcentral.cl/indicadoressiete/secure/Serie.aspx?gcode=PRE_EUR&param=cgBnAE8AOQBlAGcAIwBiAFUALQBsAEcAYgBOAEkASQBCAEcAegBFAFkAeABkADgASAA2AG8AdgB2AFMAUgBYADIAQwBzAEEARQBMAG8ASgBWADQATABrAGQAZAB1ADIAeQBBAFAAZwBhADIAbABWAHcAXwBXAGgATAAkAFIAVAB1AEIAbAB3AFoAdQBRAFgAZwA5AHgAdgAwACQATwBZADcAMwAuAGIARwBFAFIASwAuAHQA"
+
+ind_eu <- read_html(url2_eu)   
+  
+ind2_eu <- ind_eu |>  html_elements('.table')  
+
+table_eu <- ind2_eu |>  html_elements(".table") |> html_table()
+
+tabla_eu<- table_eu[[1]] |> janitor::clean_names()
+
+teu_ene <- tabla_eu |> 
+  select(da_a, enero) |> 
+  rename(dia=da_a,
+         Euro= enero) |> 
+  filter(dia>=1)
+
+
+#BC UF
+# url2_UF <- "https://si3.bcentral.cl/indicadoressiete/secure/Serie.aspx?gcode=UF&param=RABmAFYAWQB3AGYAaQBuAEkALQAzADUAbgBNAGgAaAAkADUAVwBQAC4AbQBYADAARwBOAGUAYwBjACMAQQBaAHAARgBhAGcAUABTAGUAYwBsAEMAMQA0AE0AawBLAF8AdQBDACQASABzAG0AXwA2AHQAawBvAFcAZwBKAEwAegBzAF8AbgBMAHIAYgBDAC4ARQA3AFUAVwB4AFIAWQBhAEEAOABkAHkAZwAxAEEARAA%3d"
+# 
+# ind_UF <- read_html(url2_UF)   
+#   
+# ind2_UF <- ind_UF |>  html_elements('.table')  
+# 
+# table_UF <- ind2_UF |>  html_elements(".table") |> html_table()
+# 
+# tabla_UF <- table_UF[[1]] |> janitor::clean_names()
+# 
+# tUF_ago<- tabla_UF |> 
+#   select(da_a, enero) |> 
+#   rename(dia=da_a,
+#          UF=enero) |> 
+#   filter(dia>=1)
+
+
+# UF SII
+library(rvest)
+url_sii <- "https://www.sii.cl/valores_y_fechas/uf/uf2023.htm"
+
+pag_sii <- read_html(url_sii)
+
+sii_tabla <- pag_sii |> html_elements(".table")
+
+tabla_sii <- sii_tabla[[2]] |> html_table() |> janitor::clean_names()
+
+dia_fin <- tabla_sii |>  
+  filter(enero_5==31) |> 
+  select(enero_5, enero_6)
+
+
+t1 <- tabla_sii |> select(enero, enero_2) |> rename(dia = enero,
+                                                            UF = enero_2)
+t2 <- tabla_sii |> select(enero_3, enero_4) |>  rename(dia = enero_3,
+                                                            UF = enero_4)
+t3 <- tabla_sii |> select(enero_5, enero_6) |>  rename(dia = enero_5,
+                                                            UF = enero_6)
+ 
+
+tUF_sii <- bind_rows(t1,t2,t3) |> 
+  filter(!is.na(dia))
+
+tabla_ind <- Reduce(merge, list(td_ene, teu_ene, tUF_sii))
+
+
+kable(tabla_ind, booktabs=TRUE, format = "simple", caption = "Indicadores Banco Central, desde el 1 de enero 2023") 
+
+beepr::beep(11)
+```
+
+\elandscape
+
+
+
+
+# Noticias nacionales seleccionadas
+
+```{r med_nac, echo=FALSE}
+
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "tf_medios_nac.rds"
+
+tabla_med_nac<- readRDS(paste0(ruta, file1))
+
+tabla_filtro <- bind_rows(tabla, tabla_instituciones,
+                         tabla_personas, tabla_trabajo) |> 
+  mutate(filtro="si") |>  
+  select(Titular, Medio, filtro)
+
+tabla_med_nac <- tabla_med_nac |> 
+  filter( !str_detect(Titular,c("Podcast")))
+
+tabla_med_nac_print <- tabla_med_nac |> 
+  left_join(tabla_filtro, by="Titular") |> 
+  filter(is.na(Medio.y)) |> 
+  rename( Medio = Medio.x) |> 
+  select(-c(Medio.y, filtro))
+
+
+tabla_med_nac_print <- tabla_med_nac_print |>  arrange(desc(Medio))
+
+kable(tabla_med_nac_print, format = "simple")
+
+
+```
+
+
+
+# Nocticias internacionales seleccionadas
+ 
+```{r med_ext, echo=FALSE}
+
+ruta <- "C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/"
+file1 <- "tf_medios_ext.rds"
+
+tabla_med_ext<- readRDS(paste0(ruta, file1))
+
+tabla_med_ext <- tabla_med_ext |>  arrange(desc(Medio))
+
+kable(tabla_med_ext, format = "simple")
+
+
+```
+
+```{r, eval=FALSE, echo=FALSE}
+
+###TABLA DF
+url= "https://www.df.cl/"
+
+pagina <- read_html(url) |> html_elements('h2') 
+
+tabladf <- tibble(
+  Titular = pagina |> html_elements('a') 
+                  |> html_text2(),
+  Link = paste0("",
+                str_squish(pagina |> html_elements('a') 
+                               |> html_attr('href')))
+    ) |> 
+  mutate(Link = case_when(
+    !str_detect(Link, 	"https://" ) ~ paste0("https://www.df.cl", Link), 
+    TRUE~as.character(Link)
+  ))
+
+tabla1 <- tabladf |> 
+filter(!str_detect(Titular, "Dólar en Chile cierra" )) |> distinct() |> 
+  mutate(Titular = str_sub(Titular,start = 0 ,end = 110)) |> 
+  mutate(Link=paste0("[","Link","]","(",Link,")"))|> 
+  mutate(Titular=str_conv(Titular,encoding = "UTF-8"), 
+  Titular=str_replace_all(Titular, "′", " "),
+  Titular=str_replace_all(Titular, "″", " ")) 
+
+
+knitr::kable(tabla1, format = "simple")
+```
+
