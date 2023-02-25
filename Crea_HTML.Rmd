@@ -28,7 +28,10 @@ library(htmltools)
 library(xlsx)
 
 ```
- 
+
+.cajatitulo[Reporte de prensa]
+
+
 # Tablas por tema
 ```{r pensiones, echo=FALSE}
 
@@ -192,9 +195,9 @@ tabla_dolar <- table[[1]] |> janitor::clean_names()
  
 
 td_ene<- tabla_dolar |> 
-  select(da_a, enero) |> 
+  select(da_a, febrero) |> 
   rename(dia=da_a,
-         Dolar= enero) |> 
+         Dolar= febrero) |> 
   filter(dia>=1)
 
 
@@ -210,9 +213,9 @@ table_eu <- ind2_eu |>  html_elements(".table") |> html_table()
 tabla_eu<- table_eu[[1]] |> janitor::clean_names()
 
 teu_ene <- tabla_eu |> 
-  select(da_a, enero) |> 
+  select(da_a, febrero) |> 
   rename(dia=da_a,
-         Euro= enero) |> 
+         Euro= febrero) |> 
   filter(dia>=1)
 
 
@@ -228,9 +231,9 @@ teu_ene <- tabla_eu |>
 # tabla_UF <- table_UF[[1]] |> janitor::clean_names()
 # 
 # tUF_ago<- tabla_UF |> 
-#   select(da_a, enero) |> 
+#   select(da_a, febrero) |> 
 #   rename(dia=da_a,
-#          UF=enero) |> 
+#          UF=febrero) |> 
 #   filter(dia>=1)
 
 
@@ -245,16 +248,16 @@ sii_tabla <- pag_sii |> html_elements(".table")
 tabla_sii <- sii_tabla[[2]] |> html_table() |> janitor::clean_names()
 
 dia_fin <- tabla_sii |>  
-  filter(enero_5==31) |> 
-  select(enero_5, enero_6)
+  filter(febrero_5==31) |> 
+  select(febrero_5, febrero_6)
 
 
-t1 <- tabla_sii |> select(enero, enero_2) |> rename(dia = enero,
-                                                            UF = enero_2)
-t2 <- tabla_sii |> select(enero_3, enero_4) |>  rename(dia = enero_3,
-                                                            UF = enero_4)
-t3 <- tabla_sii |> select(enero_5, enero_6) |>  rename(dia = enero_5,
-                                                            UF = enero_6)
+t1 <- tabla_sii |> select(febrero, febrero_2) |> rename(dia = febrero,
+                                                            UF = febrero_2)
+t2 <- tabla_sii |> select(febrero_3, febrero_4) |>  rename(dia = febrero_3,
+                                                            UF = febrero_4)
+t3 <- tabla_sii |> select(febrero_5, febrero_6) |>  rename(dia = febrero_5,
+                                                            UF = febrero_6)
  
 
 tUF_sii <- bind_rows(t1,t2,t3) |> 
@@ -263,7 +266,7 @@ tUF_sii <- bind_rows(t1,t2,t3) |>
 tabla_ind <- Reduce(merge, list(td_ene, teu_ene, tUF_sii))
 
 
-kable(tabla_ind, booktabs=TRUE, format = "simple", caption = "Indicadores Banco Central, desde el 1 de enero 2023") 
+kable(tabla_ind, booktabs=TRUE, format = "simple", caption = "Indicadores Banco Central, desde el 1 de febrero 2023") 
 
 beepr::beep(11)
 ```
