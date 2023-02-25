@@ -170,7 +170,7 @@ knitr::kable(tabla_trab_print, format = "simple")
 
 # Nube de palabras más repetidas en titulares
 \centering
-![]("C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf"){width=50%}
+![]("C:/Users/rgalv/Nextcloud/R/Titulares/Titulares/Resultados/nube_palabras/figura/fig_1.pdf"){width=40%}
 <!-- ![](../Resultados/graf_1.png){width=50%, height=40%} -->
 
 
@@ -291,7 +291,7 @@ tabla_med_nac <- tabla_med_nac |>
   filter( !str_detect(Titular,c("Podcast")))
 
 tabla_med_nac_print <- tabla_med_nac |> 
-  left_join(tabla_filtro, by="Titular") |> 
+  left_join(tabla_filtro, by="Titular", multiple="all") |> 
   filter(is.na(Medio.y)) |> 
   rename( Medio = Medio.x) |> 
   select(-c(Medio.y, filtro))
