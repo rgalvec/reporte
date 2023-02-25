@@ -10,7 +10,7 @@ params:
 
 ```{r, include=FALSE}
 options(tinytex.verbose = TRUE)
-#C:\Users\rgalv\Nextcloud\2023\web\GitHub\repor_prensa\reporte
+
 ```
 
 ```{r setup, include=FALSE, message=FALSE}
